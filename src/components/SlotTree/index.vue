@@ -1,6 +1,7 @@
 <template>
   <div v-loading="isLoading" class="comp-tree">
-    <el-button class="comp-tr-top" type="primary" size="small" @click="handleAddTop">添加顶级节点</el-button>
+    <el-button class="comp-tr-top" type="primary" size="small" disabled @click="handleAddTop">添加顶级节点</el-button>
+    <el-button type="primary" size="small" style="float:right" @click="handleSaveTree">{{ enable_edit? '保存':'编辑' }}</el-button>
     <!-- tree -->
     <el-tree
       ref="SlotTree"
@@ -8,6 +9,8 @@
       :props="defaultProps"
       :expand-on-click-node="false"
       highlight-current
+      accordion
+      @node-click="handleNodeClick"
       :node-key="NODE_KEY"
     >
       <div slot-scope="{ node, data }" class="comp-tr-node">
@@ -31,7 +34,7 @@
           </span>
 
           <!-- 按钮 -->
-          <span class="comp-tr-node--btns">
+          <span v-show="enable_edit" class="comp-tr-node--btns">
             <!-- 新增 -->
             <el-button icon="el-icon-plus" size="mini" circle type="primary" @click="handleAdd(node, data)"></el-button>
 
@@ -49,6 +52,8 @@
 
 <script>
 import api from '@/api/api'
+import { getTree, addNode, updateTree, deleteNode } from '@/api/tree.js'
+import { getVariable } from '@/api/variable.js'
 export default {
   name: 'Test',
   data() {
@@ -57,7 +62,7 @@ export default {
       setTree: api.treelist || [], // tree数据
       NODE_KEY: 'id', // id对应字段
       MAX_LEVEL: 5, // 设定最大层级
-      NODE_ID_START: 0, // 新增节点id，逐次递减
+      NODE_ID_START: 0, // 新增节点id，逐次递加
       startId: null,
       defaultProps: { // 默认设置
         children: 'children',
@@ -67,13 +72,24 @@ export default {
         name: '新增节点',
         pid: 0,
         children: []
-      }
+      },
+      enable_edit: false
     }
   },
+
   created() {
     // 初始值
     this.startId = this.NODE_ID_START
   },
+
+  mounted() {
+    getTree().then(response => {
+      console.log(response)
+      this.setTree = response.tree
+      this.startId = response.max_id
+    })
+  },
+
   methods: {
     handleDelete(_node, _data) { // 删除节点
       console.log(_node, _data)
@@ -83,7 +99,7 @@ export default {
         return false
       } else {
         // 删除操作
-        let DeletOprate = () => {
+        const DeletOprate = () => {
           this.$nextTick(() => {
             if (this.$refs.SlotTree) {
               this.$refs.SlotTree.remove(_data)
@@ -92,7 +108,7 @@ export default {
           })
         }
         // 二次确认
-        let ConfirmFun = () => {
+        const ConfirmFun = () => {
           this.$confirm('是否删除此节点？', '提示', {
             confirmButtonText: '确认',
             cancelButtonText: '取消',
@@ -103,6 +119,15 @@ export default {
         }
         // 判断是否新增： 新增节点直接删除，已存在的节点要二次确认
         _data[this.NODE_KEY] < this.NODE_ID_START ? DeletOprate() : ConfirmFun()
+        // ajax到后端
+        deleteNode(_data).then(response => {
+          console.log(_data)
+          if (response.code === 200) {
+            this.$message.success('删除成功')
+          } else {
+            this.$message.error('删除不成功，请刷新！')
+          }
+        })
       }
     },
     handleInput(_node, _data) { // 修改节点
@@ -111,6 +136,14 @@ export default {
       if (_node.isEdit) {
         this.$set(_node, 'isEdit', false)
       }
+      updateTree(_data).then(response => {
+        console.log(_data)
+        if (response.code === 200) {
+          this.$message.success('修改成功')
+        } else {
+          this.$message.error('修改不成功，请刷新！')
+        }
+      })
     },
     handleEdit(_node, _data) { // 编辑节点
       console.log(_node, _data)
@@ -133,9 +166,9 @@ export default {
         return false
       }
       // 参数修改
-      let obj = JSON.parse(JSON.stringify(this.initParam)) // copy参数
+      const obj = JSON.parse(JSON.stringify(this.initParam)) // copy参数
       obj.pid = _data[this.NODE_KEY] // 父id
-      obj[this.NODE_KEY] = --this.startId // 节点id：逐次递减id
+      obj[this.NODE_KEY] = ++this.startId // 节点id：逐次递减id
       // 判断字段是否存在
       if (!_data.children) {
         this.$set(_data, 'children', [])
@@ -146,11 +179,44 @@ export default {
       if (!_node.expanded) {
         _node.expanded = true
       }
+      addNode(obj).then(response => {
+        console.log(obj)
+        if (response.code === 200) {
+          this.$message.success('添加成功')
+        } else {
+          this.$message.error('添加不成功，请刷新！')
+        }
+      })
     },
     handleAddTop() { // 添加顶部节点
-      let obj = JSON.parse(JSON.stringify(this.initParam)); // copy参数
-      obj[this.NODE_KEY] = --this.startId // 节点id：逐次递减id
+      const obj = JSON.parse(JSON.stringify(this.initParam)) // copy参数
+      obj[this.NODE_KEY] = ++this.startId // 节点id：逐次递减id
       this.setTree.push(obj)
+    },
+    handleSaveTree() { // 保存树到服务器
+      this.enable_edit = !this.enable_edit
+      if (!this.enable_edit) {
+        console.log('save tree')
+        console.log(this.setTree)
+        // saveTree(this.setTree).then(response => {
+        //   console.log(response)
+        //   if (response.code === 200) {
+        //     this.$message.success('保存成功')
+        //   } else {
+        //     this.$message.error('保存不成功，请重试！')
+        //   }
+        // })
+      }
+    },
+    handleNodeClick(data) {
+      if (data.is_leaf) {
+        console.log(data)
+        getTree().then(response => {
+          console.log(response)
+          this.setTree = response.tree
+          this.startId = response.max_id
+        })
+      }
     }
   }
 }
@@ -167,7 +233,7 @@ export default {
   .comp-tree {
     width: 100%;
     max-width: 400px;
-    max-height: 80vh;
+    max-height: 90vh;
     padding: 2em;
     overflow: auto;
 
