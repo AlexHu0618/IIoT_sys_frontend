@@ -10,8 +10,8 @@
       :expand-on-click-node="false"
       highlight-current
       accordion
-      @node-click="handleNodeClick"
       :node-key="NODE_KEY"
+      @node-click="handleNodeClick"
     >
       <div slot-scope="{ node, data }" class="comp-tr-node">
         <!-- 编辑状态 -->
@@ -53,7 +53,6 @@
 <script>
 import api from '@/api/api'
 import { getTree, addNode, updateTree, deleteNode } from '@/api/tree.js'
-import { getVariable } from '@/api/variable.js'
 export default {
   name: 'Test',
   data() {
@@ -109,7 +108,8 @@ export default {
         }
         // 二次确认
         const ConfirmFun = () => {
-          this.$confirm('是否删除此节点？', '提示', {
+          const msg = _data.is_leaf ? '请先确定所有变量已删除完毕，否则会出错!' : '是否删除此节点？'
+          this.$confirm(msg, '提示', {
             confirmButtonText: '确认',
             cancelButtonText: '取消',
             type: 'warning'
@@ -173,6 +173,10 @@ export default {
       if (!_data.children) {
         this.$set(_data, 'children', [])
       }
+      // 判断是否最后一层叶子节点
+      if (_node.level === (this.MAX_LEVEL - 1)) {
+        obj['is_leaf'] = true
+      }
       // 新增数据
       _data.children.push(obj)
       // 展开节点
@@ -195,6 +199,7 @@ export default {
     },
     handleSaveTree() { // 保存树到服务器
       this.enable_edit = !this.enable_edit
+      this.$store.dispatch('treechart/changeTreeStatus', this.enable_edit)
       if (!this.enable_edit) {
         console.log('save tree')
         console.log(this.setTree)
@@ -211,11 +216,7 @@ export default {
     handleNodeClick(data) {
       if (data.is_leaf) {
         console.log(data)
-        getTree().then(response => {
-          console.log(response)
-          this.setTree = response.tree
-          this.startId = response.max_id
-        })
+        this.$store.dispatch('treechart/changeTreeNode', data.id)
       }
     }
   }

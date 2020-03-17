@@ -1,11 +1,11 @@
 <template>
-  <el-container style="height: 100%; border: 1px solid #eee">
-    <el-aside width="30%" style="background-color: rgb(238, 241, 246)">
+  <el-container>
+    <el-aside width="30%" style="background-color: rgb(238, 241, 246);">
       <my-tree></my-tree>
     </el-aside>
     <el-container>
       <el-header style="font-size: 12px">
-        <el-button type="primary" @click="dialogFormVisible = true">+添加变量</el-button>
+        <el-button v-show="!tree_editing && curNodeid?true:false" type="primary" @click="dialogFormVisible = true">+添加变量</el-button>
         <el-dialog title="添加变量" :visible.sync="dialogFormVisible">
           <el-form :model="form">
             <el-form-item label="变量名" :label-width="formLabelWidth">
@@ -16,10 +16,9 @@
             </el-form-item>
             <el-form-item label="类型大小" :label-width="formLabelWidth">
               <el-select v-model="form.size" placeholder="请选择类型">
-                <el-option label="1bit" value="1bit"></el-option>
-                <el-option label="1Byte" value="1Byte"></el-option>
-                <el-option label="2Bytes" value="2Bytes"></el-option>
-                <el-option label="4Bytes" value="4Bytes"></el-option>
+                <el-option label="1Byte" value="1"></el-option>
+                <el-option label="2Bytes" value="2"></el-option>
+                <el-option label="4Bytes" value="4"></el-option>
               </el-select>
             </el-form-item>
           </el-form>
@@ -69,46 +68,67 @@
   .el-aside {
     color: #333;
   }
-
 </style>
 
 <script>
 import mytree from '../../components/SlotTree/index.vue'
+import { getVariable, addVariable, deleteVariable } from '@/api/variable.js'
 
 export default {
   components: {
     'my-tree': mytree
   },
   data() {
-    const item = {
-      name: '转速',
-      unit: 'rad/min',
-      size: '2 Bytes',
-      value: 53
-    }
+    // const item = {
+    //   name: '转速',
+    //   unit: 'rad/min',
+    //   size: '2 Bytes',
+    //   value: Math.floor((Math.random() * 100) + 1)
+    // }
     return {
-      is_edit: false,
-      tableData: Array(5).fill(item),
+      tree_editing: false,
+      tableData: [],
       dialogFormVisible: false,
       form: {
         name: '',
         unit: '',
         size: '',
-        date1: '',
-        date2: '',
         delivery: false,
-        type: [],
         resource: '',
         desc: ''
       },
       formLabelWidth: '120px',
-      filterText: ''
+      filterText: '',
+      curNodeid: null
+    }
+  },
+
+  watch: {
+    '$store.getters.treenode': function() {
+      var node_id = this.$store.getters.treenode
+      this.curNodeid = node_id
+      console.log('the treenode is ', node_id)
+      getVariable(node_id).then(response => {
+        console.log(response)
+        var data = response.data
+        if (data) {
+          var tabledata = []
+          data.forEach(function(item) {
+            tabledata.push({ 'id': item.id, 'name': item.name, 'unit': item.unit, 'size': item.type + ' Byte', value: Math.floor((Math.random() * 100) + 1) })
+          })
+          this.tableData = tabledata
+        }
+      })
+    },
+    '$store.getters.treestatus': function() {
+      this.tree_editing = this.$store.getters.treestatus
+      console.log(this.tree_editing)
     }
   },
 
   methods: {
     changeTreeState() {
-      this.is_edit = !this.is_edit
+      this.enable_edit = !this.enable_edit
     },
 
     handleEdit(index, row) {
@@ -116,18 +136,36 @@ export default {
     },
     handleDelete(index, row) {
       console.log(index, row)
-      this.tableData.splice(index, 1)
+      var node = this.tableData[index]
+      node['node_id'] = this.curNodeid
+      deleteVariable(node).then(response => {
+        if (response.code === 200) {
+          this.$message.success('删除变量成功')
+          this.tableData.splice(index, 1)
+        } else {
+          this.$message.error('删除变量不成功，请刷新！')
+        }
+      })
     },
 
     addVariable() {
       this.dialogFormVisible = false
       var node = {
         name: this.form.name,
-        unit: 'rad/min',
+        unit: this.form.unit,
         size: this.form.size,
-        value: 53
+        value: null,
+        node_id: this.curNodeid
       }
-      this.tableData.push(node)
+      addVariable(node).then(response => {
+        console.log(node)
+        if (response.code === 200) {
+          this.$message.success('添加变量成功')
+          this.tableData.push(node)
+        } else {
+          this.$message.error('添加变量不成功，请刷新！')
+        }
+      })
     }
   }
 }

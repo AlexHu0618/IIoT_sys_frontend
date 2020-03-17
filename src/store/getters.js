@@ -5,6 +5,7 @@ const getters = {
   avatar: state => state.user.avatar,
   name: state => state.user.name,
   treenode: state => state.treechart.treeNodeID,
+  treestatus: state => state.treechart.enableEdit,
   curtab: state => state.treechart.curType2signal
 }
 export default getters
