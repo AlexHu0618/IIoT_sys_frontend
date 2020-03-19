@@ -73,7 +73,36 @@ export const constantRoutes = [
         path: 'tree',
         name: 'Tree',
         component: () => import('@/views/tree/index'),
-        meta: { title: '设备列表', icon: 'table' }
+        meta: { title: '变量映射', icon: 'table' }
+      }
+    ]
+  },
+
+  {
+    path: '/data-manage',
+    component: Layout,
+    redirect: '/data-manage',
+    name: 'DataManage',
+    meta: { title: '数据管理', icon: 'list' },
+    hidden: false,
+    children: [
+      {
+        path: 'history',
+        name: 'History',
+        component: () => import('@/views/data-manage/history'),
+        meta: { title: '历史数据', icon: 'chart' }
+      },
+      {
+        path: 'analyz',
+        name: 'Analyz',
+        component: () => import('@/views/data-manage/analyze'),
+        meta: { title: '数据分析', icon: 'guide' }
+      },
+      {
+        path: 'setting',
+        name: 'Setting',
+        component: () => import('@/views/data-manage/setting'),
+        meta: { title: '采集设置', icon: 'edit' }
       }
     ]
   },
@@ -215,7 +244,7 @@ export const constantRoutes = [
       }
     ]
   },
-  
+
   {
     path: '/test',
     component: Layout,

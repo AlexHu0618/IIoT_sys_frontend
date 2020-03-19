@@ -1,14 +1,19 @@
 <template>
   <div>
-    <my-tree></my-tree>
+    <el-row>
+      <el-col v-for="(index,item) in dfList" :key="index" :value="item" :span="3">
+        <el-input :value="dfList[item]"></el-input>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
-import mytree from '../../components/SlotTree/index.vue'
 export default {
-  components: {
-    'my-tree': mytree
+  data() {
+    return {
+      dfList: ['1个', '2个', '3个', '4个', '5个', '6个', '7个', '8个']
+    }
   }
 }
 </script>
