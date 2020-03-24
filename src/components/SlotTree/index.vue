@@ -52,7 +52,7 @@
 
 <script>
 import api from '@/api/api'
-import { getTree, addNode, updateTree, deleteNode } from '@/api/tree.js'
+import { getTree, updateTree, addNode, deleteNode, saveTree } from '@/api/tree.js'
 export default {
   name: 'Test',
   data() {
@@ -102,13 +102,13 @@ export default {
           this.$nextTick(() => {
             if (this.$refs.SlotTree) {
               this.$refs.SlotTree.remove(_data)
-              this.$message.success('删除成功！')
+              // this.$message.success('删除成功！')
             }
           })
         }
         // 二次确认
         const ConfirmFun = () => {
-          const msg = _data.is_leaf ? '请先确定所有变量已删除完毕，否则会出错!' : '是否删除此节点？'
+          const msg = _data.is_leaf ? '请先确定所有变量已删除完毕，否则无法删除!' : '是否删除此节点？'
           this.$confirm(msg, '提示', {
             confirmButtonText: '确认',
             cancelButtonText: '取消',
@@ -203,14 +203,14 @@ export default {
       if (!this.enable_edit) {
         console.log('save tree')
         console.log(this.setTree)
-        // saveTree(this.setTree).then(response => {
-        //   console.log(response)
-        //   if (response.code === 200) {
-        //     this.$message.success('保存成功')
-        //   } else {
-        //     this.$message.error('保存不成功，请重试！')
-        //   }
-        // })
+        saveTree(this.setTree).then(response => {
+          console.log(response)
+          if (response.code === 200) {
+            this.$message.success('保存成功')
+          } else {
+            this.$message.error('保存不成功，请重试！')
+          }
+        })
       }
     },
     handleNodeClick(data) {

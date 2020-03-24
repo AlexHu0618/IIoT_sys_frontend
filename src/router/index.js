@@ -249,7 +249,7 @@ export const constantRoutes = [
     path: '/test',
     component: Layout,
     name: 'test',
-    hidden: false,
+    hidden: true,
     children: [
       {
         path: 'index',

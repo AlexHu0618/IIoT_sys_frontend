@@ -1,70 +1,100 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+    <div class="title-container">
+      <h3 class="title">智能互联云系统</h3>
+    </div>
 
-      <div class="title-container">
-        <h3 class="title">雷电监测云系统</h3>
-      </div>
+    <div v-show="showLogin" class="login-wrap">
+      <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+        <h3 style="padding-left: 50%;color: #ffffff;">登录</h3>
+        <el-form-item prop="username">
+          <span class="svg-container">
+            <svg-icon icon-class="user" />
+          </span>
+          <el-input
+            ref="username"
+            v-model="loginForm.username"
+            placeholder="Username"
+            name="username"
+            type="text"
+            tabindex="1"
+            auto-complete="on"
+          />
+        </el-form-item>
 
-      <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
-      </el-form-item>
+        <el-form-item prop="password">
+          <span class="svg-container">
+            <svg-icon icon-class="password" />
+          </span>
+          <el-input
+            :key="passwordType"
+            ref="password"
+            v-model="loginForm.password"
+            :type="passwordType"
+            placeholder="Password"
+            name="password"
+            tabindex="2"
+            auto-complete="on"
+            @keyup.enter.native="handleLogin"
+          />
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+        </el-form-item>
 
-      <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="Password"
-          name="password"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
-        <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-        </span>
-      </el-form-item>
+        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+        <div class="tips">
+          <span style="margin-right:20px;" @click="ToRegister"> 没有账号？马上注册 </span>
+          <!-- <a href="http://39.108.137.187:8889/register"> 注册 </a> -->
+        </div>
+      </el-form>
+    </div>
 
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div>
+    <div v-show="showRegister" class="register-wrap">
+      <h3 style="padding-left: 50%;color: #ffffff;">注册</h3>
+      <el-form ref="registerForm" :model="registerForm" :rules="registerrules" class="register-form" auto-complete="on" label-position="left">
+        <el-form-item label="用户名" prop="name">
+          <el-input v-model="registerForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="pass">
+          <el-input v-model="registerForm.pass" :type="passwordType" autocomplete="off"></el-input>
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="checkPass">
+          <el-input v-model="registerForm.checkPass" :type="passwordType" autocomplete="off"></el-input>
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+        </el-form-item>
+        <el-form-item label="公司名称" prop="company">
+          <el-input v-model.number="registerForm.company"></el-input>
+        </el-form-item>
+        <el-button type="primary" @click="submitForm('registerForm')">提交</el-button>
+        <el-button @click="resetForm('registerForm')">重置</el-button>
+        <span @click="ToLogin">已有账号？马上登录</span>
+      </el-form>
+    </div>
 
-    </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
+// import { validUsername } from '@/utils/validate'
+import { register } from '@/api/user.js'
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
+    // const validateUsername = (rule, value, callback) => {
+    //   if (!validUsername(value)) {
+    //     callback(new Error('Please enter the correct user name'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
         callback(new Error('The password can not be less than 6 digits'))
@@ -72,18 +102,65 @@ export default {
         callback()
       }
     }
+    var checkCompany = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('公司名不能为空'))
+      }
+    }
+    var validatePass = (rule, value, callback) => {
+      if (value.length < 6) {
+        callback(new Error('密码不得少于6位'))
+      } else {
+        if (this.registerForm.checkPass !== '') {
+          this.$refs.registerForm.validateField('checkPass')
+        }
+        callback()
+      }
+    }
+    var validatePass2 = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'))
+      } else if (value !== this.registerForm.pass) {
+        callback(new Error('两次输入密码不一致!'))
+      } else {
+        callback()
+      }
+    }
     return {
+      showLogin: true,
+      showRegister: false,
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: 'test',
+        password: '1111'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        // username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      registerForm: {
+        name: '',
+        pass: '',
+        checkPass: '',
+        company: ''
+      },
+      registerrules: {
+        name: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
+        ],
+        pass: [
+          { validator: validatePass, trigger: 'blur' }
+        ],
+        checkPass: [
+          { validator: validatePass2, trigger: 'blur' }
+        ],
+        company: [
+          { validator: checkCompany, trigger: 'blur' }
+        ]
+      }
     }
   },
   watch: {
@@ -117,9 +194,45 @@ export default {
           })
         } else {
           console.log('error submit!!')
+          this.$message.error('登录错误，如未注册，请先进行注册！')
           return false
         }
       })
+    },
+    ToRegister() {
+      this.showRegister = true
+      this.showLogin = false
+    },
+    ToLogin() {
+      this.showRegister = false
+      this.showLogin = true
+    },
+    submitForm(formName) {
+      // this.$refs[formName].validate((valid) => {
+      //   if (valid) {
+      //       return true
+      //   } else {
+      //     console.log('error submit!!')
+      //     return false
+      //   }
+      // })
+      register(this.registerForm).then(response => {
+        console.log(response)
+        if (response.code === 200) {
+          this.$message.success('注册成功')
+          this.resetForm(formName)
+          this.ToLogin()
+        } else {
+          if (response.rsl === 'existed') {
+            this.$message.error('此用户名已存在，注册不成功，请重试！')
+          } else {
+            this.$message.error('注册不成功，请重试！')
+          }
+        }
+      })
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields()
     }
   }
 }
@@ -187,7 +300,16 @@ $light_gray:#eee;
     position: relative;
     width: 520px;
     max-width: 100%;
-    padding: 160px 35px 0;
+    // padding: 160px 35px 0;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .register-form {
+    position: relative;
+    width: 520px;
+    max-width: 100%;
+    // padding: 160px 35px 0;
     margin: 0 auto;
     overflow: hidden;
   }
@@ -202,6 +324,10 @@ $light_gray:#eee;
         margin-right: 16px;
       }
     }
+
+    .a {
+      text-decoration: none;
+    }
   }
 
   .svg-container {
@@ -214,9 +340,10 @@ $light_gray:#eee;
 
   .title-container {
     position: relative;
+    padding: 160px 35px 0;
 
     .title {
-      font-size: 26px;
+      font-size: 30px;
       color: $light_gray;
       margin: 0px auto 40px auto;
       text-align: center;

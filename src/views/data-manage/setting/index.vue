@@ -13,12 +13,13 @@
         <el-row :gutter="5" style="background-color: #6ee4e4;">
           <el-col v-for="(index,item) in 8" :key="index" :value="item" :span="3">
             <!-- <el-cascader v-model="dfList[index]" :options="dfOptions" :show-all-levels="false" placeholder="未指定" :disabled="enableEdit"></el-cascader> -->
-            <el-select v-model="defaultFrame[item]" :disabled="enableEdit">
+            <el-select v-model="defaultFrame[index - 1]" :disabled="enableEdit" @change="handleOpt">
               <el-option
                 v-for="item1 in selOptions"
                 :key="item1.value"
                 :label="item1.label"
                 :value="item1.value"
+                :disabled="item1.disabled"
               >
               </el-option>
             </el-select>
@@ -67,7 +68,20 @@ export default {
       defaultStepLen: '未知',
       selOptions: [{
         value: 0,
-        label: '未指定'
+        label: '未指定',
+        disabled: false
+      }, {
+        value: 1,
+        label: '未指定1',
+        disabled: false
+      }, {
+        value: 2,
+        label: '未指定2',
+        disabled: false
+      }, {
+        value: 3,
+        label: '未指定3',
+        disabled: false
       }],
       defaultFrame: [0, 0, 0, 0, 0, 0, 0, 0],
       dfOptions: [{
@@ -97,11 +111,6 @@ export default {
         this.defaultStepLen = this.stepOptions[data.step - 1].label
         this.selOptions = data.options
         this.defaultFrame = data.frame
-      //   var tabledata = []
-      //   data.forEach(function(item) {
-      //     tabledata.push({ 'id': item.id, 'name': item.name, 'unit': item.unit, 'size': item.type + ' Byte', value: Math.floor((Math.random() * 100) + 1) })
-      //   })
-      //   this.tableData = tabledata
       } else {
         this.gatewayID = '未知'
         this.defaultStepLen = '未知'
@@ -130,6 +139,26 @@ export default {
             this.$message.error('保存设置不成功，请刷新！')
           }
         })
+      }
+    },
+
+    handleOpt(item) {
+      var index = this.selOptions.findIndex(function(x) {
+        return x.value === item
+      })
+      var zero_index = this.defaultFrame.indexOf(0)
+      var arr = this.defaultFrame.slice(zero_index)
+      var rsl = arr.some(function(x) {
+        return x !== 0
+      })
+      if (rsl) {
+        this.$message.error('前面部分不能含有未指定，请重新设置！')
+        this.defaultFrame = [0, 0, 0, 0, 0, 0, 0, 0]
+        this.selOptions.forEach(function(item) {
+          item.disabled = false
+        })
+      } else {
+        this.selOptions[index].disabled = true
       }
     }
   }

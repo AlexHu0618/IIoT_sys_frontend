@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '监测云系统',
+  title: '智能互联云系统',
 
   /**
    * @type {boolean} true | false
