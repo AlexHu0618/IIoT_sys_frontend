@@ -30,7 +30,7 @@
         <template v-else>
           <!-- 名称： 新增节点增加class（is-new） -->
           <span :class="[data[NODE_KEY] < NODE_ID_START ? 'is-new' : '', 'comp-tr-node--name']">
-            {{ node.label }}
+            <svg-icon icon-class="guide" /> {{ node.label }}
           </span>
 
           <!-- 按钮 -->
@@ -57,6 +57,7 @@ export default {
   name: 'Test',
   data() {
     return {
+      nodeIcon: 'el-icon-guide',
       isLoading: false, // 是否加载
       setTree: api.treelist || [], // tree数据
       NODE_KEY: 'id', // id对应字段

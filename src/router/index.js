@@ -44,14 +44,20 @@ export const constantRoutes = [
   },
 
   {
+    path: '/dashboard',
+    component: () => import('@/views/dashboard/index'),
+    hidden: false
+  },
+
+  {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/cockpit',
     children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: '大屏总览', icon: 'dashboard' }
+      path: 'cockpit',
+      name: 'Cockpit',
+      component: () => import('@/views/cockpit/index'),
+      meta: { title: '驾驶舱', icon: 'dashboard' }
     }]
   },
 
@@ -249,7 +255,7 @@ export const constantRoutes = [
     path: '/test',
     component: Layout,
     name: 'test',
-    hidden: true,
+    hidden: false,
     children: [
       {
         path: 'index',
