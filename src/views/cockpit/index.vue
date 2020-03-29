@@ -1,32 +1,37 @@
 <template>
-  <div class="dashboard-container" style="height: 100%;">
-    {{ name }}
+  <div class="chinaecharts">
+    <el-row :gutter="10" class="myrow">
+      <el-col :span="8"><div class="grid-content bg-purple"><Gauge :my-chart="cpu"></Gauge></div></el-col>
+      <el-col :span="8"><div class="grid-content bg-purple"><Gauge :my-chart="mem"></Gauge></div></el-col>
+      <el-col :span="8"><div class="grid-content bg-purple"><Gauge :my-chart="disk"></Gauge></div></el-col>
+    </el-row>
+    <div style="height: 200px;">
+      <TimeLine></TimeLine>
+    </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import Gauge from '../cockpit/Gauge.vue'
+import TimeLine from './line.vue'
 
 export default {
-  name: 'Cockpit',
-  computed: {
-    ...mapGetters([
-      'name'
-    ])
+  components: {
+    Gauge,
+    TimeLine
+  },
+  data() {
+    return {
+      cpu: '变量A',
+      mem: '变量B',
+      disk: '变量C'
+    }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-.dashboard {
-  &-container {
-    margin: 30px;
-  }
-  &-text {
-    font-size: 30px;
-    line-height: 46px;
-  }
-}
+<style scoped>
+
 </style>
 
 <!-- <template>

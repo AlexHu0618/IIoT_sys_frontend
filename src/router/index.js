@@ -79,7 +79,8 @@ export const constantRoutes = [
         path: 'tree',
         name: 'Tree',
         component: () => import('@/views/tree/index'),
-        meta: { title: '变量映射', icon: 'table' }
+        meta: { title: '变量映射', icon: 'table' },
+        hidden: true
       }
     ]
   },
@@ -255,7 +256,7 @@ export const constantRoutes = [
     path: '/test',
     component: Layout,
     name: 'test',
-    hidden: false,
+    hidden: true,
     children: [
       {
         path: 'index',

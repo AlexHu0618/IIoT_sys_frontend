@@ -6,7 +6,7 @@
           <dv-decoration-7 style="width:100%;height:30px;">智能机电运维管理平台</dv-decoration-7></div>
         <div class="mh-right">
           <dv-border-box-2
-            style="width: 60px; height: 50px; line-height: 50px; text-align:center;margin:5px 10px;"
+            style="width: 70px; height: 30px; line-height: 30px; text-align:center;margin:5px 10px;"
           >
             <a href="/">Home</a>
           </dv-border-box-2>
@@ -22,7 +22,8 @@
             <dv-border-box-10>
               <dv-decoration-1 style="height:50px;" />
               <dv-border-box-5 style="width: 90%;height: 80%;left: 10px;">
-                <dv-decoration-9 style="width:150px;height:150px;top: 60px;left: 30px;">
+                <h2 style="padding-top:40px;padding-left: 20px;">当前故障率预测</h2>
+                <dv-decoration-9 style="width:150px;height:150px;top: 10px;left: 30px;">
                   <p style="font-size: xx-large">60%</p>
                 </dv-decoration-9>
               </dv-border-box-5>
@@ -31,6 +32,7 @@
           <MapChart />
           <div class="mc-top-right">
             <dv-border-box-10>
+              <dv-decoration-3 style="height:50px;" />
               <dv-active-ring-chart :config="mcTopRightOpt" style="width:300px;height:300px" />
               <span style="padding-left: 60px;font-size: x-large;">当前在线设备占比</span>
             </dv-border-box-10>
@@ -169,7 +171,7 @@ export default {
   }
 
   .main-header {
-    height: 80px;
+    height: 50px;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -196,7 +198,7 @@ export default {
   }
 
   .main-container {
-    height: calc(~"100% - 80px");
+    height: calc(~"100% - 50px");
     display: flex;
     margin-left: 0;
 
@@ -222,7 +224,7 @@ export default {
 
     .mc-bottom {
       height: 40%;
-      padding-bottom: 50px;
+      padding-bottom: 30px;
 
       .mc-bottom-left {
         padding: 0px 10px 20px 20px;

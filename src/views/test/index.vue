@@ -1,45 +1,58 @@
 <template>
   <div class="chinaecharts">
-    <dv-active-ring-chart :config="data" style="width:300px;height:300px" />
+    <TimeLine style="width: 400px;height: 400px;"></TimeLine>
   </div>
 </template>
 
 <script>
+import TimeLine from '../cockpit/line.vue'
+
 export default {
-  data: function() {
-    return [
-      {
-        name: '周口',
-        value: 55
-      },
-      {
-        name: '南阳',
-        value: 120
-      },
-      {
-        name: '西峡',
-        value: 78
-      },
-      {
-        name: '驻马店',
-        value: 66
-      },
-      {
-        name: '新乡',
-        value: 80
-      }
-    ]
+  components: {
+    TimeLine
+  },
+  data() {
+    return {
+      a: 'bater',
+      b: 'gg',
+      c: 'ss'
+    }
   }
 }
 </script>
 
 <style scoped>
-.chinaecharts {
-    width: 50%;
-    height: 50%;
-}
-#mapChart {
-    width: 100%;
-    height: 100%;
+.grid-content {
+  height: 300px;
+  width: 300px;
 }
 </style>
+
+<!-- <template>
+  <div>
+    <div>
+      <PerOne :te-per="go"></PerOne>
+      <PerOne :te-per="better"></PerOne>
+    </div>
+  </div>
+</template>
+
+<script>
+import PerOne from './PersonalOne'
+export default {
+  name: 'Index',
+  components: {
+    PerOne
+  },
+  data() {
+    return {
+      go: 'better',
+      better: 'go'
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style> -->
