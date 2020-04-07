@@ -26,6 +26,11 @@ export default {
       mem: '变量B',
       disk: '变量C'
     }
+  },
+  mounted() {
+    this.$store.commit('websocket/setUid', this.$store.getters.uid)
+    const uri = 'ws://172.20.10.4:8889/ws?uid=' + this.$store.getters.uid
+    this.$store.dispatch('websocket/webSocketInit', uri)
   }
 }
 </script>
