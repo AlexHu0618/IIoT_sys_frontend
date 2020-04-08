@@ -10,6 +10,10 @@ export default {
     myChart: {
       type: String,
       default: ''
+    },
+    value: {
+      type: Number,
+      default: 0
     }
   },
   data() {
@@ -31,16 +35,22 @@ export default {
             formatter: '{value}%'
           },
           data: [{
-            value: 50,
+            value: this.value,
             name: this.myChart
           }]
         }]
       }
     }
   },
+  watch: {
+    value(val) {
+      this.Opt.series[0].data[0].value = val
+      this.set()
+    }
+  },
   mounted: function() {
     this.draw()
-    setInterval(this.set, 2000)
+    // setInterval(this.set, 2000)
     // setInterval(function() {
     //   this.Opt.series[0].data[0].value = (Math.random() * 100).toFixed(2) - 0
     //   this.charts.setOption(this.Opt)
@@ -50,12 +60,12 @@ export default {
   methods: {
     draw() {
       this.charts = echarts.init(this.$refs[`${this.myChart}`])
-      this.Opt.series[0].data[0].value = (Math.random() * 100).toFixed(2) - 0
+      // this.Opt.series[0].data[0].value = (Math.random() * 100).toFixed(2) - 0
       this.charts.setOption(this.Opt)
       // setInterval(this.set(), 2000)
     },
     set() {
-      this.Opt.series[0].data[0].value = (Math.random() * 100).toFixed(2) - 0
+      // this.Opt.series[0].data[0].value = (Math.random() * 100).toFixed(2) - 0
       this.charts.setOption(this.Opt)
     }
   }

@@ -7,11 +7,19 @@ var echarts = require('echarts')
 
 export default {
   name: 'TimeLine',
+  props: {
+    curvalue: {
+      type: Object,
+      default: function() {
+        return {}
+      }
+    }
+  },
   data() {
     return {
       option: {
         title: {
-          text: '一天能耗总量分布'
+          text: '网络接收数据总量'
         },
         tooltip: {
           trigger: 'axis',
@@ -28,63 +36,74 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['00:00', '01:15', '02:30', '03:45', '05:00', '06:15', '07:30', '08:45', '10:00', '11:15', '12:30', '13:45', '15:00', '16:15', '17:30', '18:45', '20:00', '21:15', '22:30', '23:45']
+          data: []
         },
         yAxis: {
           type: 'value',
           axisLabel: {
-            formatter: '{value} Kwh'
+            formatter: '{value} GByte'
           },
           axisPointer: {
             snap: true
           }
         },
-        visualMap: {
-          show: false,
-          dimension: 0,
-          pieces: [{
-            lte: 6,
-            color: 'green'
-          }, {
-            gt: 6,
-            lte: 8,
-            color: 'red'
-          }, {
-            gt: 8,
-            lte: 14,
-            color: 'green'
-          }, {
-            gt: 14,
-            lte: 17,
-            color: 'red'
-          }, {
-            gt: 17,
-            color: 'green'
-          }]
-        },
+        // visualMap: {
+        //   show: false,
+        //   dimension: 0,
+        //   pieces: [{
+        //     lte: 6,
+        //     color: 'green'
+        //   }, {
+        //     gt: 6,
+        //     lte: 8,
+        //     color: 'red'
+        //   }, {
+        //     gt: 8,
+        //     lte: 14,
+        //     color: 'green'
+        //   }, {
+        //     gt: 14,
+        //     lte: 17,
+        //     color: 'red'
+        //   }, {
+        //     gt: 17,
+        //     color: 'green'
+        //   }]
+        // },
         series: [
           {
-            name: '耗电量',
+            name: '数据量',
             type: 'line',
             smooth: true,
-            data: [300, 280, 250, 260, 270, 300, 550, 500, 400, 390, 380, 390, 400, 500, 600, 750, 800, 700, 600, 400],
-            markArea: {
-              data: [[{
-                name: '早高峰',
-                xAxis: '07:30'
-              }, {
-                xAxis: '10:00'
-              }], [{
-                name: '晚高峰',
-                xAxis: '17:30'
-              }, {
-                xAxis: '21:15'
-              }]]
-            }
+            data: []
+            // markArea: {
+            //   data: [[{
+            //     name: '早高峰',
+            //     xAxis: '07:30'
+            //   }, {
+            //     xAxis: '10:00'
+            //   }], [{
+            //     name: '晚高峰',
+            //     xAxis: '17:30'
+            //   }, {
+            //     xAxis: '21:15'
+            //   }]]
+            // }
           }
         ]
       }
 
+    }
+  },
+  watch: {
+    'curvalue.time'(val) {
+      this.option.xAxis.data.push(val)
+      this.option.series[0].data.push(this.curvalue.value)
+      if (this.option.xAxis.data.length > 200) {
+        this.option.xAxis.data.shift()
+        this.option.series[0].data.shift()
+      }
+      this.setdata()
     }
   },
   mounted() {
@@ -93,6 +112,9 @@ export default {
   methods: {
     draw(id) {
       this.charts = echarts.init(document.getElementById(id))
+      this.charts.setOption(this.option)
+    },
+    setdata() {
       this.charts.setOption(this.option)
     }
   }

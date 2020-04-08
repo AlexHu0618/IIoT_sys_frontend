@@ -1,12 +1,12 @@
 <template>
   <div class="chinaecharts">
     <el-row :gutter="10" class="myrow">
-      <el-col :span="8"><div class="grid-content bg-purple"><Gauge :my-chart="cpu"></Gauge></div></el-col>
-      <el-col :span="8"><div class="grid-content bg-purple"><Gauge :my-chart="mem"></Gauge></div></el-col>
-      <el-col :span="8"><div class="grid-content bg-purple"><Gauge :my-chart="disk"></Gauge></div></el-col>
+      <el-col :span="8"><div class="grid-content bg-purple"><Gauge :my-chart="cpu.name" :value="cpu.value"></Gauge></div></el-col>
+      <el-col :span="8"><div class="grid-content bg-purple"><Gauge :my-chart="mem.name" :value="mem.value"></Gauge></div></el-col>
+      <el-col :span="8"><div class="grid-content bg-purple"><Gauge :my-chart="disk.name" :value="disk.value"></Gauge></div></el-col>
     </el-row>
-    <div style="height: 200px;">
-      <TimeLine></TimeLine>
+    <div style="height: 250px;">
+      <TimeLine :curvalue="curtv"></TimeLine>
     </div>
   </div>
 </template>
@@ -22,9 +22,40 @@ export default {
   },
   data() {
     return {
-      cpu: '变量A',
-      mem: '变量B',
-      disk: '变量C'
+      cpu: {
+        name: 'CPU占用',
+        value: 0
+      },
+      mem: {
+        name: '内存占用',
+        value: 0
+      },
+      disk: {
+        name: '存储已用',
+        value: 0
+      },
+      curtv: {
+        time: '00:00:00',
+        value: 0
+      }
+    }
+  },
+  computed: {
+    wsData() {
+      return this.$store.getters.wsmsg
+    }
+  },
+  watch: {
+    wsData(val) {
+      var data = JSON.parse(val)
+      console.log(data)
+      this.cpu.value = data.cpu
+      this.mem.value = data.mem
+      this.disk.value = data.disk
+      var myDate = new Date()
+      var mytime = myDate.toLocaleTimeString()
+      this.curtv.time = mytime
+      this.curtv.value = data.net
     }
   },
   mounted() {

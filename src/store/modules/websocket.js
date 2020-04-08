@@ -35,7 +35,7 @@ const mutations = {
       // that.commit('websocket/webSocketPing')
       // 注：只有连接正常打开中 ，才能正常收到消息
       state.socketTask.onmessage = function(res) {
-        console.log('收到服务器内容：' + res.data)
+        // console.log('收到服务器内容：' + res.data)
         state.msg = res.data
         // state.msg = JSON.parse(res.data)
       }
