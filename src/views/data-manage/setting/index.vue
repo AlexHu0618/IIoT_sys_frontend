@@ -1,12 +1,25 @@
 <template>
   <el-container class="my-container">
     <el-header>
-      <el-button type="primary" style="float:right;" @click="handleEditBtn">{{ labelBtn }}</el-button>
+      <a href="http://172.20.10.4:8889/download/client.7z">
+        <el-button type="primary">下载客户端 app.exe</el-button>
+      </a>
     </el-header>
     <el-main>
+      <el-row style="padding-bottom: 40px;">
+        <el-steps :active="6" align-center>
+          <el-step title="步骤1" description="在&lt;设备编辑&gt;页面添加CPU,内存,硬盘与网络四个变量"></el-step>
+          <el-step title="步骤2" description="下载客户端软件&quot;app.exe&quot;"></el-step>
+          <el-step title="步骤3" description="运行客户端软件获取网关ID"></el-step>
+          <el-step title="步骤4" description="修改本页面中的&lt;网关ID&gt;"></el-step>
+          <el-step title="步骤5" description="按照&quot;CPU->内存->硬盘->网络&quot;的顺序修改本页面中的&lt;数据帧&gt;,保存设置"></el-step>
+          <el-step title="步骤6" description="重新运行客户端软件开始采集"></el-step>
+        </el-steps>
+      </el-row>
       <el-row>
         <span style="font-size: large;font-weight: 400;">网关ID：</span>
         <el-input v-model="gatewayID" style="width: 300px;margin-bottom: 30px;" :disabled="enableEdit"></el-input>
+        <el-button type="primary" style="float:right;" @click="handleEditBtn">{{ labelBtn }}</el-button>
       </el-row>
       <el-row>
         <span style="font-size: large;font-weight: 400;">数据帧：</span>
